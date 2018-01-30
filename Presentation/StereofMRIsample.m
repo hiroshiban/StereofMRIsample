@@ -28,7 +28,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2017-12-29 15:00:53 ban"
+% Last Update: "2018-01-30 23:25:34 ban"
 %
 %
 % [input]
@@ -387,7 +387,8 @@ if useStimulusFile
   % load stimulusfile
   run(fullfile(rootDir,'subjects',subjID,stimulusfile));
 
-  sparam.blank_duration=sparam.block_duration-sparam.stimulation_duration;
+  % sparam structure is loaded by the code above.
+  sparam.blank_duration=sparam.block_duration-sparam.stimulation_duration;       %#ok
   sparam.stim_off_duration=sparam.trialDuration-sparam.stim_on_duration;
   sparam.trialsPerBlock=round(sparam.stimulation_duration/sparam.trialDuration);
 
@@ -578,8 +579,7 @@ if ~user_answer, diary off; return; end
 
 % set 1 only when you are sure that you are going to ignore the display vertical synch signals
 %Screen('Preference','SkipSyncTests',1);
-
-scrID=1; % generally screen ID is 1 if you use HB's 3D experiment setup at CiNet.
+scrID=2; % generally screen ID is 1 if you use HB's 3D experiment setup at CiNet.
 [winPtr,winRect,nScr,dparam.fps,dparam.ifi,initDisplay_OK]=InitializePTBDisplays(dparam.ExpMode,sparam.bgcolor,0,[],scrID);
 if ~initDisplay_OK, error('Display initialization error. Please check your exp_run parameter.'); end
 HideCursor();
@@ -636,7 +636,7 @@ Screen('BlendFunction',winPtr,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % displaying texts on the center of the screen
-DisplayMessage2('Initializing...',sparam.bgcolor,winPtr,nScr,'Arial',36);
+%DisplayMessage2('Initializing...',sparam.bgcolor,winPtr,nScr,'Arial',36);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -652,7 +652,7 @@ sparam.cm_per_pix=1/sparam.pix_per_cm;
 sparam.pix_per_deg=round( 1/( 180*atan(sparam.cm_per_pix/sparam.vdist)/pi ) );
 
 % calculate wedge height
-wedge_height=zeros(numel(sparam.disparity),1);
+wedge_height=zeros(numel(sparam.jitters),numel(sparam.disparity));
 for tt=1:1:numel(sparam.jitters) % for sparam.jitter, e.g. -1,0,+1
   for ii=1:1:numel(sparam.disparity)
     wedge_height(tt,ii)=CalcDistFromDisparity(sparam.ipd,sparam.disparity(ii)+sparam.jitters(tt),sparam.vdist); % unit: cm;
@@ -716,6 +716,13 @@ if strfind(upper(subjID),'DEBUG')
   if ~exist(save_dir,'dir'), mkdir(save_dir); end
 
   % generating and saving the depth stimuli
+  imgL=cell(numel(sparam.jitters),1);
+  imgR=cell(numel(sparam.jitters),1);
+  for ii=1:1:length(imgL)
+    imgL=cell(numel(sparam.disparity),sparam.trialsPerBlock);
+    imgR=cell(numel(sparam.disparity),sparam.trialsPerBlock);
+  end
+
   for tt=1:1:numel(sparam.jitters) % for jitter, -1,0,+1
     for ii=1:1:numel(sparam.disparity)
       for jj=1:1:sparam.trialsPerBlock
@@ -753,6 +760,7 @@ end % if strfind(upper(subjID),'DEBUG')
 %%%% this is required to present the stimulus on time at the baginning of the presentation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+stim=cell(2,1);
 if stim_mode==1
   % wedge-shaped depth stimulus
   order=shuffle(1:1:sparam.trialsPerBlock);
@@ -805,7 +813,7 @@ background=Screen('MakeTexture',winPtr,bgimg{1});
 fcross{1}=Screen('MakeTexture',winPtr,fix_L);
 fcross{2}=Screen('MakeTexture',winPtr,fix_R);
 
-[wait_fix_L,wait_fix_R]=CreateFixationImg(sparam.fixsize,[32,32,32],sparam.bgcolor,sparam.fixlinesize(2),sparam.fixlinesize(1),0,0); %#ok
+[wait_fix_L,wait_fix_R]=CreateFixationImg(sparam.fixsize,[32,32,32],sparam.bgcolor,sparam.fixlinesize(2),sparam.fixlinesize(1),0,0);
 wait_fcross{1}=Screen('MakeTexture',winPtr,wait_fix_L);
 wait_fcross{2}=Screen('MakeTexture',winPtr,wait_fix_R);
 
@@ -898,7 +906,7 @@ disp('done.');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % displaying texts on the center of the screen
-DisplayMessage2('Ready to Start',sparam.bgcolor,winPtr,nScr,'Arial',36);
+%DisplayMessage2('Ready to Start',sparam.bgcolor,winPtr,nScr,'Arial',36);
 ttime=GetSecs(); while (GetSecs()-ttime < 0.5), end  % run up the clock.
 
 
@@ -989,7 +997,7 @@ for currenttrial=1:1:length(design)
     % specifically, one period is divided into the first and the second half, and
     % the vernier task bar is presented one of the half period if vernierOn is 1.
     for jj=1:1:2
-      tStart=GetSecs();
+      %tStart=GetSecs();
       for nn=1:1:nScr
         Screen('SelectStereoDrawBuffer',winPtr,nn-1);
         Screen('DrawTexture',winPtr,background,[],CenterRect(bgRect,winRect)+yshift);
@@ -1108,10 +1116,10 @@ for currenttrial=1:1:length(design)
 
       % stimulus ON period
       % here the *2 is required since each presentation period is devided into 2.
-      trialIndex=(currenttrial-1)*2*(sparam.trialsPerBlock+blank_trialsPerBlock)+sparam.trialsPerBlock+2*ii-1;
+      %trialIndex=(currenttrial-1)*2*(sparam.trialsPerBlock+blank_trialsPerBlock)+sparam.trialsPerBlock+2*ii-1;
 
       for jj=1:1:2 % devide one period into 2 for the vernier bar discrimination task
-        tStart=GetSecs();
+        %tStart=GetSecs();
         for nn=1:1:nScr
           Screen('SelectStereoDrawBuffer',winPtr,nn-1);
           Screen('DrawTexture',winPtr,background,[],CenterRect(bgRect,winRect)+yshift);
@@ -1198,6 +1206,7 @@ disp('done.');
 % calculate & display task performance
 % The codes below simply calculates the overall task accuracies, ignoring the condition differnces.
 % if you want to calculate the accuracies by your own criteria etc, please change the codes below.
+correct_events=cell(numel(sparam.vernierpos),1);
 for ii=1:1:numel(sparam.vernierpos)
   if sparam.vernierpos(ii)<=0
     correct_events{ii}={sparam.vernierpos(ii),'key1'};
@@ -1229,7 +1238,7 @@ diary off;
 %%%% Catch the errors
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-catch
+catch %#ok
   % this "catch" section executes in case of an error in the "try" section
   % above.  Importantly, it closes the onscreen window if its open.
   Screen('CloseAll');

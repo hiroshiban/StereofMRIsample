@@ -4,14 +4,14 @@
 % the stimulus presentations.
 %
 % Created    : "2017-12-28 10:27:05 ban"
-% Last Update: "2017-12-29 11:27:19 ban"
+% Last Update: "2018-01-30 22:43:33 ban"
 % ************************************************************
 
 % dparam: display parameters
 
 % display mode, one of "mono", "dual", "dualparallel", "dualcross", "cross", "parallel", "redgreen", "greenred",
 % "redblue", "bluered", "shutter", "topbottom", "bottomtop", "interleavedline", "interleavedcolumn"
-dparam.ExpMode='cross';%'dualparallel'
+dparam.ExpMode='redgreen';%'shutter';%'dualparallel'
 
 % a method to start stimulus presentation
 % 0:ENTER/SPACE, 1:Left-mouse button, 2:the first MR trigger pulse (CiNet),

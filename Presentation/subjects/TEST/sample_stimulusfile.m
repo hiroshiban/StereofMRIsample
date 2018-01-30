@@ -4,7 +4,7 @@
 % the stimulus presentations.
 %
 % Created    : "2017-12-28 10:27:05 ban"
-% Last Update: "2017-12-29 11:08:16 ban"
+% Last Update: "2018-01-30 22:43:01 ban"
 % ************************************************************
 
 % sparam: stimulus generation parameters
