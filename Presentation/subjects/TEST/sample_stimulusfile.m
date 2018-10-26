@@ -4,7 +4,7 @@
 % the stimulus presentations.
 %
 % Created    : "2017-12-28 10:27:05 ban"
-% Last Update: "2018-01-30 22:43:01 ban"
+% Last Update: "2018-09-27 16:12:41 ban"
 % ************************************************************
 
 % sparam: stimulus generation parameters
@@ -71,7 +71,7 @@ sparam.bgcolor=[128,128,128];
 
 %%% RGB for background patches, [1x3] matrices
 sparam.patch_size=[30,30];      % background patch size, [height,width] in pixels
-sparam.patch_num=[20,20];       % the number of background patches along vertical and horizontal axis
+sparam.patch_num=[20,40];       % the number of background patches along vertical and horizontal axis
 sparam.patch_color1=[255,255,255];
 sparam.patch_color2=[0,0,0];
 

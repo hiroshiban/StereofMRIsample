@@ -30,7 +30,7 @@ function imgs=CreateDepthPatchField(fieldSize,npatches,ipd,vdist,pix_per_cm,base
 %
 %
 % Created
-% Last Update: "2017-12-29 14:03:41 ban"
+% Last Update: "2018-01-31 16:49:22 ban"
 
 % check input variables
 if nargin<5, help(mfilename()); imgs=[]; return; end
@@ -113,9 +113,11 @@ for ii=1:1:nimg
   % set jitter disparities to be added to patches
   jitters=RandLim([npatches(1),npatches(2)],jitterdisp(1),jitterdisp(2));
   dist=CalcDistFromDisparity(ipd,jitters,vdist);
-  xshifts(1,:,:)=ceil(RayTrace_ScreenPos_X(-1*dist,ipd,vdist,1,pix_per_cm,0));
-  xshifts(2,:,:)=ceil(RayTrace_ScreenPos_X(-1*dist,ipd,vdist,2,pix_per_cm,0));
-
+  %xshifts(1,:,:)=ceil(RayTrace_ScreenPos_X(-1*dist,ipd,vdist,1,pix_per_cm,0));
+  %xshifts(2,:,:)=ceil(RayTrace_ScreenPos_X(-1*dist,ipd,vdist,2,pix_per_cm,0));
+  xshifts(1,:,:)=ceil(RayTrace_ScreenPos_X(dist,ipd,vdist,1,pix_per_cm,0));
+  xshifts(2,:,:)=ceil(RayTrace_ScreenPos_X(dist,ipd,vdist,2,pix_per_cm,0));
+  
   % order the patches by the added disparity to prevent occlusion problem
   valx=squeeze(xshifts(1,:,:));
   valx=valx(:);

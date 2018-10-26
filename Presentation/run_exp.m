@@ -18,7 +18,7 @@ function OK=run_exp(subj,exp_num,run_ids)
 %           without any error [true/false]
 %
 % Created    : "2017-12-29 13:07:06 ban"
-% Last Update: "2017-12-29 14:18:12 ban"
+% Last Update: "2018-10-26 10:33:03 ban"
 
 %% input variable check
 if nargin<3, help(mfilenae()); return; end
@@ -64,14 +64,19 @@ if ~exist(subj_dir,'dir')
   copyfile(fullfile(pwd,'subjects','_DEFAULT_'),subj_dir);
 end
 
-% loading gamma correction table.
-% gamma=load('your_gamma_table');
-gamma=repmat(linspace(0.0,1.0,256),3,1)';
+% ********************************************************************************************************
+% *** set gamma table. please change the line below to use the actual measuments of the display gamma. ***
+% ********************************************************************************************************
 
+% loading gamma_table
+load(fullfile('..','gamma_table','ASUS_ROG_Swift_PG278Q','181003','cbs','gammatablePTB.mat'));
+%load(fullfile('..','gamma_table','ASUS_VG278HE','181003','cbs','gammatablePTB.mat'));
+%load(fullfile('..','gamma_table','MEG_B1','151225','cbs','gammatablePTB.mat'));
+%gammatable=repmat(linspace(0.0,1.0,256),3,1)'; %#ok % a simple linear gamma
 
 %% run the stimulus presentation code
 for ii=run_ids
-  command_str=sprintf('StereofMRIsample(''%s'',%d,''sample_displayfile'',''sample_stimulusfile'',gamma,1,%d);',subj,ii,exp_num);
+  command_str=sprintf('StereofMRIsample(''%s'',%d,''sample_displayfile'',''sample_stimulusfile'',gammatable,1,%d);',subj,ii,exp_num);
   eval(command_str);
 end
 OK=true;

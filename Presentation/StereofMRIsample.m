@@ -28,7 +28,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2018-01-30 23:25:34 ban"
+% Last Update: "2018-10-24 16:08:55 ban"
 %
 %
 % [input]
@@ -580,6 +580,17 @@ if ~user_answer, diary off; return; end
 % set 1 only when you are sure that you are going to ignore the display vertical synch signals
 %Screen('Preference','SkipSyncTests',1);
 scrID=2; % generally screen ID is 1 if you use HB's 3D experiment setup at CiNet.
+
+% ************************************* IMPORTANT NOTE *****************************************
+% if the console PC has been connected to two 3D displays with the expanding display setups and
+% some shutter goggles (e.g. nVidia 3DVision2) are used for displaying 3D stimulus with MATLAB
+% Psychtoolbox3 (PTB3), the 3D stimuli can be presented properly only when we select the first
+% display (scrID=1) for stimulus presentations, while left/right images seem to be flipped if
+% we select the second display (scrID=2) as the main stimulus presentation window. This may be
+% a bug of PTB3. So in any case, if you run 3D vision experiments with dual monitors, it would
+% be safer to always chose the first monitor for stimulus presentations. Please be careful.
+% ************************************* IMPORTANT NOTE *****************************************
+
 [winPtr,winRect,nScr,dparam.fps,dparam.ifi,initDisplay_OK]=InitializePTBDisplays(dparam.ExpMode,sparam.bgcolor,0,[],scrID);
 if ~initDisplay_OK, error('Display initialization error. Please check your exp_run parameter.'); end
 HideCursor();
@@ -757,7 +768,7 @@ end % if strfind(upper(subjID),'DEBUG')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Generating the first depth stimulus
-%%%% this is required to present the stimulus on time at the baginning of the presentation
+%%%% this is required to present the stimulus on time at the beginning of the presentation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 stim=cell(2,1);
@@ -889,7 +900,7 @@ fprintf('saving the stimulus generation and presentation parameters...');
 savefname=fullfile(resultDir,[num2str(subjID),sprintf('_%s_run_',mfilename()),num2str(acq,'%02d'),'.mat']);
 
 % backup the old file(s)
-if overwrite_flg
+if ~overwrite_flg
   rdir=relativepath(resultDir); rdir=rdir(1:end-1);
   BackUpObsoleteFiles(rdir,[num2str(subjID),sprintf('_%s_run_',mfilename()),num2str(acq,'%02d'),'.mat'],'_old');
   clear rdir;
@@ -1184,7 +1195,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 experimentDuration=GetSecs()-the_experiment_start;
-event=event.add_event('End',[],the_experiment_start);
+event=event.add_event('End',[]);
 disp(' ');
 fprintf('Experiment Completed: %.2f/%.2f secs\n',experimentDuration,...
   sum(dparam.initial_fixation_time)+sparam.numConds*sparam.numRepeats*sparam.block_duration);

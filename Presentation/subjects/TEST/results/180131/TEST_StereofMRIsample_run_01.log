@@ -1,0 +1,171 @@
+Using Psychtoolbox 3.0.13 - make sure this is correct before you continue
+PTB-INFO: Multi-display setup in explicit multi-display mode detected. Using the following mapping:
+PTB-INFO: Screen 0 corresponds to the full Windows desktop area. Useful for stereo presentations in stereomode=4 ...
+PTB-INFO: Screen 1 corresponds to the display area of the monitor with the Windows-internal name \\.\DISPLAY1 ...
+PTB-INFO: Screen 2 corresponds to the display area of the monitor with the Windows-internal name \\.\DISPLAY2 ...
+
+PTB-INFO: Your version of Matlab 64-Bit is not DPI aware. On Windows-8 or later, without DPI awareness, fullscreen
+PTB-INFO: onscreen windows will only work properly when displayed on displays with 96 DPI effective pixel density.
+PTB-INFO: Displaying on anything other than a 96 DPI display will cause mysterious visual timing problems, sync failures etc.
+PTB-INFO: Read 'help RetinaDisplay' for more info on this topic.
+
+The Presentation Parameters are as below.
+************************************************
+****** Script, Subject, Acquistion Number ******
+Running Script Name    : StereofMRIsample
+Subject ID             : TEST
+Acquisition Number     : 1
+********* Run Type, Display Image Type *********
+Display Mode           : redgreen
+use Full Screen Mode   : 0
+Start Method           : 4
+Custom Trigger         : t
+*************** Screen Settings ****************
+Screen Height          : 1024
+Screen Width           : 1280
+*********** Stimulus Conditions etc. ***********
+number of conditions   : 8
+number of repetitions  : 3
+*********** Stimulation Periods etc. ***********
+Fixation Time(sec)     : [16,16]
+Block Duration(sec)    : 32
+Trial Duration(sec)    : 16
+Blank Duration(sec)    : 16
+Repetitions(cycles)    : 3
+Total Time (sec)       : 800
+************ Response key settings *************
+Reponse Key #1         : 82=r
+Reponse Key #2         : 71=g
+************************************************
+
+Please carefully check before proceeding.
+
+Are you ready to proceed? (y/n) : y
+
+
+PTB-INFO: This is Psychtoolbox-3 for Microsoft Windows, under Matlab 64-Bit (Version 3.0.14 - Build date: Oct  3 2017).
+PTB-INFO: Support status on this operating system release: Windows version 10.0 supported and tested to some limited degree.
+PTB-INFO: Type 'PsychtoolboxVersion' for more detailed version information.
+PTB-INFO: Most parts of the Psychtoolbox distribution are licensed to you under terms of the MIT License, with
+PTB-INFO: some restrictions. See file 'License.txt' in the Psychtoolbox root folder for the exact licensing conditions.
+
+PTB-INFO: The detected endline of the vertical blank interval is equal or lower than the startline. This indicates
+PTB-INFO: that i couldn't detect the duration of the vertical blank interval and won't be able to correct timestamps
+PTB-INFO: for it. This will introduce a very small and constant offset (typically << 1 msec). Read 'help BeampositionQueries'
+PTB-INFO: for how to correct this, should you really require that last few microseconds of precision.
+PTB-INFO: Btw. this can also mean that your systems beamposition queries are slightly broken. It may help timing precision to
+PTB-INFO: enable the beamposition workaround, as explained in 'help ConserveVRAMSettings', section 'kPsychUseBeampositionQueryWorkaround'.
+
+
+PTB-INFO: OpenGL-Renderer is NVIDIA Corporation :: Quadro K4000/PCIe/SSE2 :: 4.6.0 NVIDIA 390.65
+PTB-INFO: VBL startline = 1440 , VBL Endline = 1439
+PTB-INFO: Measured monitor refresh interval from beamposition = 16.680103 ms [59.951670 Hz].
+PTB-INFO: Will use beamposition query for accurate Flip time stamping.
+PTB-INFO: Measured monitor refresh interval from VBLsync = 16.675942 ms [59.966627 Hz]. (50 valid samples taken, stddev=0.061976 ms.)
+PTB-INFO: Reported monitor refresh interval from operating system = 16.949153 ms [59.000000 Hz].
+PTB-INFO: Small deviations between reported values are normal and no reason to worry.
+PTB-INFO: Stereo display via Anaglyph Red-Green stereo enabled.
+PTB-INFO: ==============================================================================================================================
+PTB-INFO: WINDOWS DWM DESKTOP COMPOSITOR IS ACTIVE. On this Windows-10 or later system, Psychtoolbox can no longer reliably detect if
+PTB-INFO: this will cause trouble for timing and integrity of visual stimuli or not. You might be just fine, or you could be in trouble.
+PTB-INFO: Use external measurement equipment and independent procedures to verify reliability of timing if you care about proper timing.
+PTB-INFO: ==============================================================================================================================
+PTB-INFO: Psychtoolbox imaging pipeline starting up for window with requested imagingmode 1025 ...
+PTB-INFO: Will use 8 bits per color component framebuffer for stimulus drawing.
+PTB-INFO: Will use 8 bits per color component framebuffer for stimulus post-processing (if any).
+saving the stimulus generation and presentation parameters...done.
+
+Experiment running...
+
+fixation
+Block 0001 (cond 06, -4.00 arcmins): 01 02 01 02 01 02 03 03 
+Blank 0001 (cond 06, no stimulus): ... 
+
+PTB-ERROR: Screen('Flip'); beamposition timestamping computed an *impossible stimulus onset value* of 141240.670778 secs, which would indicate that
+PTB-ERROR: stimulus onset happened *before* it was actually requested! (Earliest theoretically possible 141240.678052 secs).
+
+PTB-ERROR: Some more diagnostic values (only for experts): rawTimestamp = 141240.681498, scanline = 925
+PTB-ERROR: Some more diagnostic values (only for experts): line_pre_swaprequest = 619, line_post_swaprequest = 747, time_post_swaprequest = 141240.679495
+PTB-ERROR: Some more diagnostic values (only for experts): preflip_vblcount = 109, preflip_vbltimestamp = 141240.603906
+PTB-ERROR: Some more diagnostic values (only for experts): postflip_vblcount = 0, postflip_vbltimestamp = -1.000000, vbltimestampquery_retrycount = 0
+
+PTB-ERROR: This error can be due to either of the following causes:
+PTB-ERROR: Very unlikely: Something is broken in your systems beamposition timestamping. I've disabled high precision
+PTB-ERROR: timestamping for now. Returned timestamps will be less robust and accurate.
+
+PTB-ERROR: The most likely cause would be that Synchronization of stimulus onset (buffer swap) to the
+PTB-ERROR: vertical blank interval VBL is not working properly, or swap completion signalling to PTB is broken.
+PTB-ERROR: Please run the script PerceptualVBLSyncTest to check this. With non-working sync to VBL, all stimulus timing
+PTB-ERROR: is futile. Also run OSXCompositorIdiocyTest on macOS. Also read 'help SyncTrouble' !
+
+Block 0002 (cond 05, -2.00 arcmins): 01 03 03 01 02 02 02 01 
+Blank 0002 (cond 05, no stimulus): ... 
+Block 0003 (cond 08, -12.00 arcmins): 01 03 03 01 02 02 03 02 
+Blank 0003 (cond 08, no stimulus): ... 
+Block 0004 (cond 03, 4.00 arcmins): 03 02 01 02 01 01 01 02 
+Blank 0004 (cond 03, no stimulus): ... 
+Block 0005 (cond 02, 8.00 arcmins): 01 03 02 03 01 02 03 01 
+Blank 0005 (cond 02, no stimulus): ... 
+Block 0006 (cond 08, -12.00 arcmins): 02 03 01 01 01 02 01 03 
+Blank 0006 (cond 08, no stimulus): ... 
+Block 0007 (cond 01, 12.00 arcmins): 02 02 03 01 01 03 03 02 
+Blank 0007 (cond 01, no stimulus): ... 
+Block 0008 (cond 07, -8.00 arcmins): 01 01 02 01 01 03 03 03 
+Blank 0008 (cond 07, no stimulus): ... 
+Block 0009 (cond 02, 8.00 arcmins): 03 02 03 01 01 02 02 03 
+Blank 0009 (cond 02, no stimulus): ... 
+Block 0010 (cond 07, -8.00 arcmins): 01 01 03 01 01 01 03 03 
+Blank 0010 (cond 07, no stimulus): ... 
+Block 0011 (cond 05, -2.00 arcmins): 02 02 02 01 01 03 02 03 
+Blank 0011 (cond 05, no stimulus): ... 
+Block 0012 (cond 03, 4.00 arcmins): 01 02 01 01 03 03 02 03 
+Blank 0012 (cond 03, no stimulus): ... 
+Block 0013 (cond 01, 12.00 arcmins): 03 01 01 02 02 01 02 01 
+Blank 0013 (cond 01, no stimulus): ... 
+Block 0014 (cond 08, -12.00 arcmins): 03 02 02 01 02 03 03 02 
+Blank 0014 (cond 08, no stimulus): ... 
+Block 0015 (cond 07, -8.00 arcmins): 01 02 01 02 02 02 02 01 
+Blank 0015 (cond 07, no stimulus): ... 
+Block 0016 (cond 06, -4.00 arcmins): 01 02 01 03 02 02 03 02 
+Blank 0016 (cond 06, no stimulus): ... 
+Block 0017 (cond 04, 2.00 arcmins): 02 02 02 01 01 02 03 01 
+Blank 0017 (cond 04, no stimulus): ... 
+Block 0018 (cond 03, 4.00 arcmins): 02 03 01 03 03 02 03 02 
+Blank 0018 (cond 03, no stimulus): ... 
+Block 0019 (cond 04, 2.00 arcmins): 02 03 01 01 02 01 03 02 
+Blank 0019 (cond 04, no stimulus): ... 
+Block 0020 (cond 06, -4.00 arcmins): 02 03 01 01 02 01 02 02 
+Blank 0020 (cond 06, no stimulus): ... 
+Block 0021 (cond 04, 2.00 arcmins): 01 01 02 02 01 03 01 03 
+Blank 0021 (cond 04, no stimulus): ... 
+Block 0022 (cond 01, 12.00 arcmins): 02 02 01 01 02 02 02 02 
+Blank 0022 (cond 01, no stimulus): ... 
+Block 0023 (cond 05, -2.00 arcmins): 01 03 03 03 03 02 02 02 
+Blank 0023 (cond 05, no stimulus): ... 
+Block 0024 (cond 02, 8.00 arcmins): 02 02 02 01 02 01 01 02 
+Blank 0024 (cond 02, no stimulus): ... 
+fixation
+ 
+Experiment Completed: 800.00/800.00 secs
+ 
+saving data...done.
+******************************
+Total Tasks     : 0
+Total Responses : 221
+Hit Rate        : NaN%
+False alarms    : 221
+Median RT (Hit) : NaN ms
+******************************
+done.
+
+
+INFO: PTB's Screen('Flip', 10) command seems to have missed the requested stimulus presentation deadline
+INFO: a total of 2 times out of a total of 966 flips during this session.
+
+INFO: This number is fairly accurate (and indicative of real timing problems in your own code or your system)
+INFO: if you provided requested stimulus onset times with the 'when' argument of Screen('Flip', window [, when]);
+INFO: If you called Screen('Flip', window); without the 'when' argument, this count is more of a ''mild'' indicator
+INFO: of timing behaviour than a hard reliable measurement. Large numbers may indicate problems and should at least
+INFO: deserve your closer attention. Cfe. 'help SyncTrouble', the FAQ section at www.psychtoolbox.org and the
+INFO: examples in the PDF presentation in PsychDocumentation/Psychtoolbox3-Slides.pdf for more info and timing tips.
+
