@@ -4,7 +4,7 @@
 % the stimulus presentations.
 %
 % Created    : "2017-12-28 10:27:05 ban"
-% Last Update: "2017-12-29 11:08:16 ban"
+% Last Update: "2018-11-12 10:59:28 ban"
 % ************************************************************
 
 % sparam: stimulus generation parameters
@@ -35,6 +35,9 @@ sparam.avoid_bias_flg=0;
 % if 1, a mex function used. Please note that since the function put the most priority
 % to processing speed, the generated RDS quality may not be always the best.
 sparam.use_mex_flg=1;
+
+%%% fixation period in sec before/after presenting the target stimuli
+sparam.initial_fixation_time=[16,16]; %[2,2];
 
 %%% stimulius presentation durations in sec
 %

@@ -1,7 +1,7 @@
-function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwrite_flg,stim_mode)
+function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwrite_flg,force_proceed_flag,stim_mode)
 
 % A block-design fMRI experiment with wedge-shaped near/far depth stimuli consisted of Rndom-Dot-Stereograms (RDSs).
-% function StereofMRIsample(subjID,acq,:displayfile,:stimulusfile,:gamma_table,:overwrite_flg,:stim_mode)
+% function StereofMRIsample(subjID,acq,:displayfile,:stimulusfile,:gamma_table,:overwrite_flg,:force_proceed_flag,:stim_mode)
 % (: is optional)
 %
 % [about]
@@ -28,7 +28,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2018-10-24 16:08:55 ban"
+% Last Update: "2018-11-12 13:37:01 ban"
 %
 %
 % [input]
@@ -58,6 +58,9 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %                 file with the same acquisition number will be overwritten by the previous one.
 %                 if 0, the existing file will be backed-up by adding a prefix '_old' at the tail
 %                 of the file. 0 by default.
+% force_proceed_flag : (optional) whether proceeding stimulus presentatin without waiting for
+%                 the experimenter response (e.g. presesing the ENTER key) or a trigger.
+%                 if 1, the stimulus presentation will be automatically carried on.
 % stim_mode     : (optional) stimulus mode. 1 or 2. this script presents wedge-shaped near/far depth
 %                 stimuli when stim_mode=1, while it presents multiple random-depth patches when
 %                 stim_mode=2 as another example. 1 by default.
@@ -99,6 +102,8 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 % % "redblue", "bluered", "shutter", "topbottom", "bottomtop", "interleavedline", "interleavedcolumn"
 % dparam.ExpMode='cross';
 %
+% dparam.scrID=1; % screen ID, generally 0 for a single display setup, 1 for dual display setup
+%
 % % a method to start stimulus presentation
 % % 0:ENTER/SPACE, 1:Left-mouse button, 2:the first MR trigger pulse (CiNet),
 % % 3:waiting for a MR trigger pulse (BUIC) -- checking onset of pin #11 of the parallel port,
@@ -120,9 +125,6 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %
 % %% shift the screen center position along y-axis (to prevent the occlusion of the stimuli due to the coil)
 % dparam.yshift=0;%30;
-%
-% %%% fixation period in sec before/after presenting the target stimuli
-% dparam.initial_fixation_time=[16,16]; %[2,2];
 %
 %
 % [About stimulusfile]
@@ -167,6 +169,9 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 % % if 1, a mex function used. Please note that since the function put the most priority
 % % to processing speed, the generated RDS quality may not be always the best.
 % sparam.use_mex_flg=1;
+%
+% %%% fixation period in sec before/after presenting the target stimuli
+% sparam.initial_fixation_time=[16,16]; %[2,2];
 %
 % %%% stimulius presentation durations in sec
 % %
@@ -223,11 +228,17 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 
 %clear global; clear mex;
 if nargin<2, help(mfilename()); return; end
+if nargin<3 || isempty(displayfile), displayfile=[]; end
+if nargin<4 || isempty(stimulusfile), stimulusfile=[]; end
+if nargin<5 || isempty(gamma_table), gamma_table=[]; end
 if nargin<6 || isempty(overwrite_flg), overwrite_flg=0; end
-if nargin<7 || isempty(stim_mode), stim_mode=1; end
+if nargin<7 || isempty(force_proceed_flag), force_proceed_flag=0; end
+if nargin<8 || isempty(stim_mode), stim_mode=1; end
 
 % check the aqcuisition number.
 if acq<1, error('Acquistion number must be integer and greater than zero'); end
+
+% check the subject directory
 if ~exist(fullfile(pwd,'subjects',subjID),'dir'), error('can not find subj directory. check input variable.'); end
 
 
@@ -281,7 +292,7 @@ InitializeRandomSeed();
 %%%% Reset display Gamma-function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if nargin<5 || isempty(gamma_table)
+if isempty(gamma_table)
   gamma_table=repmat(linspace(0.0,1.0,256),3,1)'; %#ok
   GammaResetPTB(1.0);
 else
@@ -290,177 +301,74 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%% Load and validate the contents of display and stimulus files
+%%%% Validate dparam (displayfile) and sparam (stimulusfile) structures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% the codes below may be too redundant. you can omit those lines if you can care about the input
-% variables and the contents of display and stimulus files by yourself.
+% check the display/stimulus files
+if ~isempty(displayfile)
+  if ~strcmpi(displayfile(end-1:end),'.m'), displayfile=[displayfile,'.m']; end
+  [is_exist,message]=IsExistYouWant(fullfile(rootDir,'subjects',subjID,displayfile),'file');
+  if ~is_exist, error(message); end
+end
 
-% check the number of nargin
-if nargin<=1
-  error('takes at least 2 arguments: %s(subjID, acq, :displayfile, :stimulusfile, :gamma_table, :stim_mode)',mfilename());
-elseif nargin>7
-  error('takes at most 7 arguments: %s(subjID, acq, :displayfile, :stimulusfile, :gamma_table, :overwrite_flg, :stim_mode)',mfilename());
-else
-  if nargin==2
-    useDisplayFile=false;
-    useStimulusFile=false;
-  end
-  if nargin>=3
-    % reading display (presentation) parameters from file
-    if strcmp(displayfile(end-1:end),'.m')
-      dfile=fullfile(rootDir,'subjects',subjID,displayfile);
-    else
-      dfile=fullfile(rootDir,'subjects',subjID,[displayfile,'.m']);
-    end
-    [is_exist,message]=IsExistYouWant(dfile,'file');
-    if is_exist
-      useDisplayFile=true;
-    else
-      error(message);
-    end
-  end
-  if nargin>=4
-    % reading stimulus generation parameters from file
-    if strcmp(stimulusfile(end-1:end),'.m')
-      sfile=fullfile(rootDir,'subjects',subjID,stimulusfile);
-    else
-      sfile=fullfile(rootDir,'subjects',subjID,[stimulusfile '.m']);
-    end
-    [is_exist,message]=IsExistYouWant(sfile,'file');
-    if is_exist
-      useStimulusFile=true;
-    else
-      error(message);
-    end
-  end
-end % if nargin
+if ~isempty(stimulusfile)
+  if ~strcmpi(stimulusfile(end-1:end),'.m'), stimulusfile=[stimulusfile,'.m']; end
+  [is_exist,message]=IsExistYouWant(fullfile(rootDir,'subjects',subjID,stimulusfile),'file');
+  if ~is_exist, error(message); end
+end
 
-% check condition files
+% organize dparam
+dparam=struct(); % initialize
+if ~isempty(displayfile), run(fullfile(rootDir,'subjects',subjID,displayfile)); end % load specific dparam parameters configured for each of the participants
+dparam=ValidateStructureFields(dparam,... % validate fields and set the default values to missing field(s)
+         'ExpMode','cross',...
+         'scrID',0,...
+         'start_method',1,...
+         'custom_trigger',KbName(84),...
+         'Key1',37,...
+         'Key2',39,...
+         'fullscr',false,...
+         'ScrHeight',1200,...
+         'ScrWidth',1920,...
+         'yshift',0);
 
-% set display parameters
-if useDisplayFile
-
-  % load displayfile
-  run(fullfile(rootDir,'subjects',subjID,displayfile));
-
-  dparam.RunScript=mfilename();
-
-else  % if useDisplayFile
-
-  % otherwise, set default variables
-
-  % display mode, one of "mono", "dual", "dualparallel", "dualcross", "cross", "parallel", "redgreen", "greenred",
-  % "redblue", "bluered", "shutter", "topbottom", "bottomtop", "interleavedline", "interleavedcolumn"
-  dparam.ExpMode='cross';
-
-  % a method to start stimulus presentation
-  % 0:ENTER/SPACE, 1:Left-mouse button, 2:the first MR trigger pulse (CiNet),
-  % 3:waiting for a MR trigger pulse (BUIC) -- checking onset of pin #11 of the parallel port,
-  % or 4:custom key trigger (wait for a key input that you specify as tgt_key).
-  dparam.start_method=4;
-
-  % a pseudo trigger key from the MR scanner when it starts, only valid when dparam.start_method=4;
-  dparam.custom_trigger=KbName(84); % 't' is a default trigger code from MR scanner at CiNet
-
-  %% keyboard settings
-  dparam.Key1=82; % key 1 'r'
-  dparam.Key2=71; % key 2 'g'
-
-  % otherwise, set default variables
-  dparam.fullscr='true';
-
-  dparam.ScrHeight=1024;
-  dparam.ScrWidth=1280;
-
-  %% shift the screen center position along y-axis (to prevent the occlusion of the stimuli due to the coil)
-  dparam.yshift=30;
-
-  %%% fixation period in sec before/after presenting the target stimuli, integer ([16,16])
-  dparam.initial_fixation_time=[16,16]; %[2,2];
-
-end % if useDisplayFile
-
-% set stimulus parameters
-if useStimulusFile
-
-  % load stimulusfile
-  run(fullfile(rootDir,'subjects',subjID,stimulusfile));
-
-  % sparam structure is loaded by the code above.
-  sparam.blank_duration=sparam.block_duration-sparam.stimulation_duration;       %#ok
-  sparam.stim_off_duration=sparam.trialDuration-sparam.stim_on_duration;
-  sparam.trialsPerBlock=round(sparam.stimulation_duration/sparam.trialDuration);
-
-else  % if useStimulusFile
-
-  % otherwise, set the default variables
-
-  %%% image size and disparity
-  sparam.fieldSize=[7,7];         % target stimulus size in deg
-  sparam.radius=[1,5];            % wedge [min,max] radius in deg
-  sparam.nwedges=4;               % the number of wedges
-  sparam.wedgeangle=80;           % wedge angle in deg
-  sparam.disparity=[12,  8,  4,  2, -2, -4, -8, -12]; % binocular disparities to be used, numel(sparam.disparity)=number_of_conditions
-  sparam.jitters=[-0.5,0,0.5];    % disparity jutters used at each stimulus presentation
-
-  %%% RDS parameters
-  sparam.dotRadius=[0.05,0.05];   % radius of RDS's white/black ovals
-  sparam.dotDens=2;               % deinsity of dot in RDS image (1-100)
-  sparam.colors=[255,0,128];      % RDS colors [dot1,dot2,background](0-255)
-  sparam.oversampling_ratio=2;    % oversampling_ratio for fine scale RDS images, [val]
-
-  % whether the random dots are filled in the background (zero-disparity) regions or not.
-  % if 1, the zero-disparity regions are masked.
-  sparam.skipzero_flg=0;
-
-  % whether avoiding dot overlaps and density biases as much as possible in generating RDSs.
-  % if 1, overlaps etc are taken into account. however, it is more time consuming.
-  sparam.avoid_bias_flg=0;
-
-  % whether using a mex function in generating RDSs.
-  % if 1, a mex function used. Please note that since the function put the most priority
-  % to processing speed, the generated RDS quality may not be always the best.
-  sparam.use_mex_flg=1;
-
-  sparam.block_duration=32;       % block length (stimulation_duration + blank_duration)
-  sparam.stimulation_duration=16; % stimulation duration in one sparam.block_duration
-  sparam.trialDuration=2;         % trial length in sparam.stimulation_duration
-  sparam.stim_on_duration=1;      % stim on duration in each trial
-
-  sparam.blank_duration=sparam.block_duration-sparam.stimulation_duration;       % blank period after the stimulus presentation
-  sparam.stim_off_duration=sparam.trialDuration-sparam.stim_on_duration;         % stim off duration
-  sparam.trialsPerBlock=round(sparam.stimulation_duration/sparam.trialDuration); % trials per block
-
-  sparam.numRepeats=3;            % number of repetitions of a condition in one run
-
-  %%% fixation size and color
-  sparam.fixsize=24;              % the whole size (a circular hole) of the fixation cross in pixel
-  sparam.fixlinesize=[12,2];      % [height,width] of the fixation line in pixel
-  sparam.fixcolor=[255,255,255];
-
-  %%% background color
-  sparam.bgcolor=[128,128,128];
-
-  %%% RGB for background patches, [1x3] matrices
-  sparam.patch_size=[30,30];      % background patch size, [height,width] in pixels
-  sparam.patch_num=[20,20];       % the number of background patches along vertical and horizontal axis
-  sparam.patch_color1=[255,255,255];
-  sparam.patch_color2=[0,0,0];
-
-  %%% vernier task positions in pixels
-  sparam.verniersize=[6,2];       % [height,width] of the vernier bar in pixel
-  sparam.vernierpos=[-3,-2,-1,0,1,2,3]; % vernier position against the center of the screen in pixel
-
-  %%% viewing parameters
-  sparam.ipd=6.4;
-  sparam.pix_per_cm=57.1429;
-  sparam.vdist=65;
-
-end % if useStimulusFile
+% organize sparam
+sparam=struct(); % initialize
+if ~isempty(stimulusfile), run(fullfile(rootDir,'subjects',subjID,stimulusfile)); end % load specific sparam parameters configured for each of the participants
+sparam=ValidateStructureFields(sparam,... % validate fields and set the default values to missing field(s)
+         'fieldSize',[7,7],...
+         'radius',[1,5],...
+         'nwedges',4,...
+         'wedgeangle',80,...
+         'disparity',[12,  8,  4,  2, -2, -4, -8, -12],...
+         'jitters',[-0.5,0,0.5],...
+         'dotRadius',[0.05,0.05],...
+         'dotDens',2,...
+         'colors',[255,0,128],...
+         'oversampling_ratio',2,...
+         'skipzero_flg',0,...
+         'avoid_bias_flg',0,...
+         'use_mex_flg',1,...
+         'block_duration',32,...
+         'stimulation_duration',16,...
+         'trialDuration',2,...
+         'stim_on_duration',1,...
+         'numRepeats',3,...
+         'fixsize',24,...
+         'fixlinesize',[12,2],...
+         'fixcolor',[255,255,255],...
+         'bgcolor',[128,128,128],...
+         'patch_size',[30,30],...
+         'patch_num',[20,20],...
+         'patch_color1',[255,255,255],...
+         'patch_color2',[0,0,0],...
+         'verniersize',[6,2],...
+         'vernierpos',[-3,-2,-1,0,1,2,3],...
+         'ipd',6.4,...
+         'pix_per_cm',57.1429,...
+         'vdist',65);
 
 % set the other parameters
-
 dparam.RunScript=mfilename();
 sparam.RunScript=mfilename();
 
@@ -501,13 +409,13 @@ eval(sprintf('disp(''number of conditions   : %d'');',sparam.numConds));
 eval(sprintf('disp(''number of repetitions  : %d'');',sparam.numRepeats));
 disp('*********** Stimulation Periods etc. ***********');
 eval(sprintf('disp(''Fixation Time(sec)     : [%d,%d]'');',...
-     dparam.initial_fixation_time(1),dparam.initial_fixation_time(2)));
+     sparam.initial_fixation_time(1),sparam.initial_fixation_time(2)));
 eval(sprintf('disp(''Block Duration(sec)    : %d'');',sparam.block_duration));
 eval(sprintf('disp(''Trial Duration(sec)    : %d'');',sparam.stimulation_duration));
 eval(sprintf('disp(''Blank Duration(sec)    : %d'');',sparam.blank_duration));
 eval(sprintf('disp(''Repetitions(cycles)    : %d'');',sparam.numRepeats));
 eval(sprintf('disp(''Total Time (sec)       : %d'');',...
-     sum(dparam.initial_fixation_time)+sparam.numConds*sparam.numRepeats*(sparam.block_duration)));
+     sum(sparam.initial_fixation_time)+sparam.numConds*sparam.numRepeats*(sparam.block_duration)));
 disp('************ Response key settings *************');
 eval(sprintf('disp(''Reponse Key #1         : %d=%s'');',dparam.Key1,KbName(dparam.Key1)));
 eval(sprintf('disp(''Reponse Key #2         : %d=%s'');',dparam.Key2,KbName(dparam.Key2)));
@@ -540,11 +448,11 @@ if sparam.blank_duration~=0 % insert zero (=blank condition) between stimulation
   designcur=designcur(:);
 end
 
-if dparam.initial_fixation_time(1)~=0 % insert zero at the head of the design (initial fixation)
+if sparam.initial_fixation_time(1)~=0 % insert zero at the head of the design (initial fixation)
   if designcur(1)~=0, designcur=[0;designcur]; end
 end
 
-if dparam.initial_fixation_time(2)~=0 % insert zero at the head of the design (final fixation)
+if sparam.initial_fixation_time(2)~=0 % insert zero at the head of the design (final fixation)
   if designcur(end)~=0, designcur=[designcur;0]; end
 end
 
@@ -569,8 +477,10 @@ resps.initialize(event); % initialize responselogger
 %%%% Wait for user reponse to start
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[user_answer,resps]=resps.wait_to_proceed();
-if ~user_answer, diary off; return; end
+if ~force_proceed_flag
+  [user_answer,resps]=resps.wait_to_proceed();
+  if ~user_answer, diary off; return; end
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -579,7 +489,6 @@ if ~user_answer, diary off; return; end
 
 % set 1 only when you are sure that you are going to ignore the display vertical synch signals
 %Screen('Preference','SkipSyncTests',1);
-scrID=2; % generally screen ID is 1 if you use HB's 3D experiment setup at CiNet.
 
 % ************************************* IMPORTANT NOTE *****************************************
 % if the console PC has been connected to two 3D displays with the expanding display setups and
@@ -591,7 +500,7 @@ scrID=2; % generally screen ID is 1 if you use HB's 3D experiment setup at CiNet
 % be safer to always chose the first monitor for stimulus presentations. Please be careful.
 % ************************************* IMPORTANT NOTE *****************************************
 
-[winPtr,winRect,nScr,dparam.fps,dparam.ifi,initDisplay_OK]=InitializePTBDisplays(dparam.ExpMode,sparam.bgcolor,0,[],scrID);
+[winPtr,winRect,nScr,dparam.fps,dparam.ifi,initDisplay_OK]=InitializePTBDisplays(dparam.ExpMode,sparam.bgcolor,0,[],dparam.scrID);
 if ~initDisplay_OK, error('Display initialization error. Please check your exp_run parameter.'); end
 HideCursor();
 
@@ -964,7 +873,7 @@ targetTime=the_experiment_start;
 % it may be better to put the behavior task during this fixation period to equalize the
 % attentional load with the main experiment period. But also see the comment on the task
 % during the blank period below. Anyway to add tasks in the fixation period is very easy.
-if dparam.initial_fixation_time(1)~=0
+if sparam.initial_fixation_time(1)~=0
   event=event.add_event('Initial Fixation',[]);
   fprintf('\nfixation\n');
 
@@ -977,7 +886,7 @@ if dparam.initial_fixation_time(1)~=0
   Screen('Flip', winPtr,[],[],[],1);
 
   % wait for the initial fixation
-  targetTime=targetTime+dparam.initial_fixation_time(1);
+  targetTime=targetTime+sparam.initial_fixation_time(1);
   while GetSecs()<targetTime, [resps,event]=resps.check_responses(event); end
 end
 
@@ -1172,7 +1081,7 @@ end % for currenttrial=1:1:length(design)
 % it may be better to put the behavior task during this fixation period to equalize the
 % attentional load with the main experiment period. But also see the comment on the task
 % during the blank period above. Anyway to add tasks in the fixation period is very easy.
-if dparam.initial_fixation_time(2)~=0
+if sparam.initial_fixation_time(2)~=0
   event=event.add_event('Final Fixation',[]);
   fprintf('fixation\n');
 
@@ -1185,7 +1094,7 @@ if dparam.initial_fixation_time(2)~=0
   Screen('Flip', winPtr,[],[],[],1);
 
   % wait for the initial fixation
-  targetTime=targetTime+dparam.initial_fixation_time(2);
+  targetTime=targetTime+sparam.initial_fixation_time(2);
   while (GetSecs()<targetTime), [resps,event]=resps.check_responses(event); end
 end
 
@@ -1198,7 +1107,7 @@ experimentDuration=GetSecs()-the_experiment_start;
 event=event.add_event('End',[]);
 disp(' ');
 fprintf('Experiment Completed: %.2f/%.2f secs\n',experimentDuration,...
-  sum(dparam.initial_fixation_time)+sparam.numConds*sparam.numRepeats*sparam.block_duration);
+  sum(sparam.initial_fixation_time)+sparam.numConds*sparam.numRepeats*sparam.block_duration);
 disp(' ');
 
 

@@ -4,7 +4,7 @@
 % the stimulus presentations.
 %
 % Created    : "2017-12-28 10:27:05 ban"
-% Last Update: "2017-12-29 11:27:19 ban"
+% Last Update: "2018-11-12 11:00:12 ban"
 % ************************************************************
 
 % dparam: display parameters
@@ -12,6 +12,8 @@
 % display mode, one of "mono", "dual", "dualparallel", "dualcross", "cross", "parallel", "redgreen", "greenred",
 % "redblue", "bluered", "shutter", "topbottom", "bottomtop", "interleavedline", "interleavedcolumn"
 dparam.ExpMode='cross';%'dualparallel'
+
+dparam.scrID=1; % screen ID, generally 0 for a single display setup, 1 for dual display setup
 
 % a method to start stimulus presentation
 % 0:ENTER/SPACE, 1:Left-mouse button, 2:the first MR trigger pulse (CiNet),
@@ -34,6 +36,3 @@ dparam.ScrWidth=1280;
 
 %% shift the screen center position along y-axis (to prevent the occlusion of the stimuli due to the coil)
 dparam.yshift=0;%30;
-
-%%% fixation period in sec before/after presenting the target stimuli
-dparam.initial_fixation_time=[16,16]; %[2,2];
