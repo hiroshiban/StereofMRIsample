@@ -28,7 +28,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2018-11-12 13:37:01 ban"
+% Last Update: "2018-11-22 20:18:45 ban"
 %
 %
 % [input]
@@ -125,6 +125,9 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %
 % %% shift the screen center position along y-axis (to prevent the occlusion of the stimuli due to the coil)
 % dparam.yshift=0;%30;
+%
+% % whther skipping the PTB's vertical-sync signal test. if 1, the sync test is skipped
+% dparam.skip_sync_test=0;
 %
 %
 % [About stimulusfile]
@@ -239,7 +242,18 @@ if nargin<8 || isempty(stim_mode), stim_mode=1; end
 if acq<1, error('Acquistion number must be integer and greater than zero'); end
 
 % check the subject directory
-if ~exist(fullfile(pwd,'subjects',subjID),'dir'), error('can not find subj directory. check input variable.'); end
+if ~exist(fullfile(pwd,'subjects',subjID),'dir'), error('can not find subj directory. check the input variable.'); end
+
+% check the display/stimulus files
+if ~isempty(displayfile)
+  if ~strcmpi(displayfile(end-1:end),'.m'), displayfile=[displayfile,'.m']; end
+  if ~exist(fullfile(rootDir,'subjects',subjID,displayfile),'file'), error('displayfile not found. check the input variable.'); end
+end
+
+if ~isempty(stimulusfile)
+  if ~strcmpi(stimulusfile(end-1:end),'.m'), stimulusfile=[stimulusfile,'.m']; end
+  if ~exist(fullfile(rootDir,'subjects',subjID,stimulusfile),'file'), error('stimulusfile not found. check the input variable.'); end
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -304,19 +318,6 @@ end
 %%%% Validate dparam (displayfile) and sparam (stimulusfile) structures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% check the display/stimulus files
-if ~isempty(displayfile)
-  if ~strcmpi(displayfile(end-1:end),'.m'), displayfile=[displayfile,'.m']; end
-  [is_exist,message]=IsExistYouWant(fullfile(rootDir,'subjects',subjID,displayfile),'file');
-  if ~is_exist, error(message); end
-end
-
-if ~isempty(stimulusfile)
-  if ~strcmpi(stimulusfile(end-1:end),'.m'), stimulusfile=[stimulusfile,'.m']; end
-  [is_exist,message]=IsExistYouWant(fullfile(rootDir,'subjects',subjID,stimulusfile),'file');
-  if ~is_exist, error(message); end
-end
-
 % organize dparam
 dparam=struct(); % initialize
 if ~isempty(displayfile), run(fullfile(rootDir,'subjects',subjID,displayfile)); end % load specific dparam parameters configured for each of the participants
@@ -330,7 +331,8 @@ dparam=ValidateStructureFields(dparam,... % validate fields and set the default 
          'fullscr',false,...
          'ScrHeight',1200,...
          'ScrWidth',1920,...
-         'yshift',0);
+         'yshift',0,...
+         'skip_sync_test',0);
 
 % organize sparam
 sparam=struct(); % initialize
@@ -487,8 +489,7 @@ end
 %%%% Initialization of Left & Right screens for binocular presenting/viewing mode
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% set 1 only when you are sure that you are going to ignore the display vertical synch signals
-%Screen('Preference','SkipSyncTests',1);
+if dparam.skip_sync_test, Screen('Preference','SkipSyncTests',1); end
 
 % ************************************* IMPORTANT NOTE *****************************************
 % if the console PC has been connected to two 3D displays with the expanding display setups and
@@ -850,11 +851,13 @@ Screen('Flip', winPtr,[],[],[],1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % add time stamp (this also works to load add_event method in memory in advance of the actual displays)
-fprintf('\nExperiment running...\n');
+fprintf('\nWaiting for the start...\n');
 event=event.add_event('Experiment Start',strcat([datestr(now,'yymmdd'),' ',datestr(now,'HH:mm:ss')]),GetSecs());
 
 % waiting for stimulus presentation
 resps.wait_stimulus_presentation(dparam.start_method,dparam.custom_trigger);
+%PlaySound(1);
+fprintf('\nExperiment running...\n');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1139,6 +1142,13 @@ end
 eval(sprintf('save -append %s event task;',savefname));
 disp('done.');
 
+% tell the experimenter that the measurements are completed
+try
+  for ii=1:1:3, Snd('Play',sin(2*pi*0.2*(0:900)),8000); end
+catch
+  % do nothing
+end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Cleaning up the PTB screen, removing path to the subfunctions, and finalizing the script
@@ -1162,7 +1172,7 @@ catch %#ok
   % this "catch" section executes in case of an error in the "try" section
   % above.  Importantly, it closes the onscreen window if its open.
   Screen('CloseAll');
-  ShowCursor;
+  ShowCursor();
   Priority(0);
   GammaResetPTB(1.0);
   tmp=lasterror; %#ok

@@ -4,7 +4,7 @@
 % the stimulus presentations.
 %
 % Created    : "2017-12-28 10:27:05 ban"
-% Last Update: "2018-11-12 11:00:12 ban"
+% Last Update: "2018-11-22 20:18:07 ban"
 % ************************************************************
 
 % dparam: display parameters
@@ -36,3 +36,6 @@ dparam.ScrWidth=1280;
 
 %% shift the screen center position along y-axis (to prevent the occlusion of the stimuli due to the coil)
 dparam.yshift=0;%30;
+
+% whther skipping the PTB's vertical-sync signal test. if 1, the sync test is skipped
+dparam.skip_sync_test=0;
