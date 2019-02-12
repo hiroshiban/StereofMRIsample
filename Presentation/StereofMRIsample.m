@@ -28,7 +28,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2018-11-22 20:18:45 ban"
+% Last Update: "2018-12-20 11:29:20 ban"
 %
 %
 % [input]
@@ -911,7 +911,7 @@ for currenttrial=1:1:length(design)
     % stimulus ON period
     % here the *2 is required since each presentation period is devided into 2.
     trialIndex=(currenttrial-1)*2*(sparam.trialsPerBlock+blank_trialsPerBlock)+2*ii-1;
-    event=event.add_event('Stim On',\n
+    event=event.add_event('Stim On',[]);
 
     % devide one period into 2 for the vernier bar discrimination task
     % specifically, one period is divided into the first and the second half, and
@@ -1030,7 +1030,7 @@ for currenttrial=1:1:length(design)
   % vernier task codes below.
 
   if sparam.blank_duration~=0
-    event=event.add_event('Blank',\n
+    event=event.add_event('Blank',[]);
     fprintf('Blank %04d (cond %02d, no stimulus): ... ',currenttrial,cond);
     for ii=1:1:blank_trialsPerBlock
 
