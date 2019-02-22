@@ -28,7 +28,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2018-12-20 11:29:20 ban"
+% Last Update: "2019-02-22 13:38:23 ban"
 %
 %
 % [input]
@@ -619,7 +619,7 @@ clear wedge_field wedge_height;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Debug codes
-%%%% just to save each images as *.png format files.
+%%%% saving the stimulus images as *.png format files and enter the debug (keyboard) mode
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if strfind(upper(subjID),'DEBUG')
@@ -630,7 +630,7 @@ if strfind(upper(subjID),'DEBUG')
   Screen('CloseAll');
   figure; hold on;
 
-  save_dir=fullfile(rootDir,'subjects',subjID,'images');
+  save_dir=fullfile(resultDir,'images');
   if ~exist(save_dir,'dir'), mkdir(save_dir); end
 
   % generating and saving the depth stimuli
@@ -849,7 +849,7 @@ Screen('Flip', winPtr,[],[],[],1);
 
 % add time stamp (this also works to load add_event method in memory in advance of the actual displays)
 fprintf('\nWaiting for the start...\n');
-event=event.add_event('Experiment Start',strcat([datestr(now,'yymmdd'),' ',datestr(now,'HH:mm:ss')]),GetSecs());
+event=event.add_event('Experiment Start',strcat([datestr(now,'yymmdd'),' ',datestr(now,'HH:mm:ss')]),NaN);
 
 % waiting for stimulus presentation
 resps.wait_stimulus_presentation(dparam.start_method,dparam.custom_trigger);
