@@ -18,7 +18,7 @@ function OK=run_exp(subj,exp_num,run_ids)
 %           without any error [true/false]
 %
 % Created    : "2017-12-29 13:07:06 ban"
-% Last Update: "2018-10-26 10:33:03 ban"
+% Last Update: "2019-03-01 15:15:30 ban"
 
 %% input variable check
 if nargin<3, help(mfilenae()); return; end
@@ -41,7 +41,7 @@ end
 % [NOTE]
 % if the subj directory is not found, create subj directory, copy all condition files
 % from _DEFAULT_, and then run the script using the parameters in the default directory
-subj_dir=fullfile(pwd,'subjects',subj);
+subj_dir=fullfile(fileparts(mfilename('fullpath')),'subjects',subj);
 if ~exist(subj_dir,'dir')
   disp('The subject directory was not found.');
   user_response=0;
@@ -61,7 +61,7 @@ if ~exist(subj_dir,'dir')
   end
 
   %mkdir(subj_dir);
-  copyfile(fullfile(pwd,'subjects','_DEFAULT_'),subj_dir);
+  copyfile(fullfile(fileparts(mfilename('fullpath')),'subjects','_DEFAULT_'),subj_dir);
 end
 
 % ********************************************************************************************************

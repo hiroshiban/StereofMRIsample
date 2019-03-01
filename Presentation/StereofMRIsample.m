@@ -28,7 +28,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2019-02-22 13:38:23 ban"
+% Last Update: "2019-02-28 18:34:31 ban"
 %
 %
 % [input]
@@ -229,7 +229,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %%%% Check the input variables
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%clear global; clear mex;
+clear global; clear mex;
 if nargin<2, help(mfilename()); return; end
 if nargin<3 || isempty(displayfile), displayfile=[]; end
 if nargin<4 || isempty(stimulusfile), stimulusfile=[]; end
@@ -1157,7 +1157,7 @@ Priority(0);
 GammaResetPTB(1.0);
 rmpath(genpath(fullfile(rootDir,'..','Common')));
 rmpath(fullfile(rootDir,'..','Generation'));
-close all; clear all; clear mex; clear global;
+clear all; clear mex; clear global;
 diary off;
 
 
@@ -1182,8 +1182,7 @@ catch %#ok
   keyboard;
   rmpath(genpath(fullfile(rootDir,'..','Common')));
   rmpath(fullfile(rootDir,'..','Generation'));
-  %psychrethrow(psychlasterror);
-  close all; clear global; clear mex; clear all;
+  clear all; clear mex; clear global;
   return
 end % try..catch
 
