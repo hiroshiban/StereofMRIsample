@@ -28,7 +28,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2019-02-28 18:34:31 ban"
+% Last Update: "2021-06-10 01:26:18 ban"
 %
 %
 % [input]
@@ -93,13 +93,13 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 % % the stimulus presentations.
 % %
 % % Created    : "2017-12-28 10:27:05 ban"
-% % Last Update: "2017-12-28 15:59:14 ban"
+% % Last Update: "2021-06-10 01:26:18 ban"
 % % ************************************************************
 %
 % % dparam: display parameters
 %
-% % display mode, one of "mono", "dual", "dualparallel", "dualcross", "cross", "parallel", "redgreen", "greenred",
-% % "redblue", "bluered", "shutter", "topbottom", "bottomtop", "interleavedline", "interleavedcolumn"
+% % display mode, one of "mono", "dual", "dualcross", "dualparallel", "cross", "parallel", "redgreen", "greenred",
+% % "redblue", "bluered", "shutter", "topbottom", "bottomtop", "interleavedline", "interleavedcolumn", "propixxmono", "propixxstereo"
 % dparam.ExpMode='cross';
 %
 % dparam.scrID=1; % screen ID, generally 0 for a single display setup, 1 for dual display setup
@@ -141,7 +141,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 % % the stimulus presentations.
 % %
 % % Created    : "2017-12-28 10:27:05 ban"
-% % Last Update: "2017-12-28 16:40:41 ban"
+% % Last Update: "2021-06-10 01:26:18 ban"
 % % ************************************************************
 %
 % % sparam: stimulus generation parameters
@@ -241,6 +241,8 @@ if nargin<8 || isempty(stim_mode), stim_mode=1; end
 % check the aqcuisition number.
 if acq<1, error('Acquistion number must be integer and greater than zero'); end
 
+rootDir=fileparts(mfilename('fullpath'));
+
 % check the subject directory
 if ~exist(fullfile(pwd,'subjects',subjID),'dir'), error('can not find subj directory. check the input variable.'); end
 
@@ -261,7 +263,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % add paths to the subfunctions
-rootDir=fileparts(mfilename('fullpath'));
 addpath(genpath(fullfile(rootDir,'..','Common')));
 addpath(fullfile(rootDir,'..','Generation'));
 
@@ -351,6 +352,7 @@ sparam=ValidateStructureFields(sparam,... % validate fields and set the default 
          'skipzero_flg',0,...
          'avoid_bias_flg',0,...
          'use_mex_flg',1,...
+         'initial_fixation_time',[16,16],...
          'block_duration',32,...
          'stimulation_duration',16,...
          'trialDuration',2,...
@@ -407,7 +409,6 @@ fprintf('Screen Height          : %d\n',dparam.ScrHeight);
 fprintf('Screen Width           : %d\n',dparam.ScrWidth);
 fprintf('*********** Stimulus Conditions etc. ***********\n');
 fprintf('number of conditions   : %d\n',sparam.numConds);
-fprintf('number of repetitions  : %d\n',sparam.numRepeats);
 fprintf('*********** Stimulation Periods etc. ***********\n');
 fprintf('Fixation Time(sec)     : [%d,%d]\n',...
      sparam.initial_fixation_time(1),sparam.initial_fixation_time(2));
@@ -637,8 +638,8 @@ if strfind(upper(subjID),'DEBUG')
   imgL=cell(numel(sparam.jitters),1);
   imgR=cell(numel(sparam.jitters),1);
   for ii=1:1:length(imgL)
-    imgL=cell(numel(sparam.disparity),sparam.trialsPerBlock);
-    imgR=cell(numel(sparam.disparity),sparam.trialsPerBlock);
+    imgL{ii}=cell(numel(sparam.disparity),sparam.trialsPerBlock);
+    imgR{ii}=cell(numel(sparam.disparity),sparam.trialsPerBlock);
   end
 
   for tt=1:1:numel(sparam.jitters) % for jitter, -1,0,+1
@@ -763,6 +764,24 @@ vernier=Screen('MakeTexture',winPtr,vernier_texture);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Prepare blue lines for stereo image flip sync with VPixx PROPixx
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% There seems to be a blueline generation bug on some OpenGL systems.
+% SetStereoBlueLineSyncParameters(winPtr, winRect(4)) corrects the
+% bug on some systems, but breaks on other systems.
+% We'll just disable automatic blueline, and manually draw our own bluelines!
+
+if strcmpi(dparam.ExpMode,'propixxstereo')
+  SetStereoBlueLineSyncParameters(winPtr, winRect(4)+10);
+  blueRectOn(1,:)=[0, winRect(4)-1, winRect(3)/4, winRect(4)];
+  blueRectOn(2,:)=[0, winRect(4)-1, winRect(3)*3/4, winRect(4)];
+  blueRectOff(1,:)=[winRect(3)/4, winRect(4)-1, winRect(3), winRect(4)];
+  blueRectOff(2,:)=[winRect(3)*3/4, winRect(4)-1, winRect(3), winRect(4)];
+end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Image size adjusting to match the current display resolutions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -816,7 +835,7 @@ end
 % save the current parameters
 eval(sprintf('save %s subjID acq design sparam dparam gamma_table;',savefname));
 
-disp('done.');
+fprintf('done.\n');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -838,6 +857,12 @@ for nn=1:1:nScr
   Screen('SelectStereoDrawBuffer',winPtr,nn-1);
   Screen('DrawTexture',winPtr,background,[],CenterRect(bgRect,winRect)+yshift);
   Screen('DrawTexture',winPtr,wait_fcross{nn},[],CenterRect(fixRect,winRect)+yshift);
+
+  % blue line for stereo sync
+  if strcmpi(dparam.ExpMode,'propixxstereo')
+    Screen('FillRect',winPtr,[0,0,255],blueRectOn(nn,:));
+    Screen('FillRect',winPtr,[0,0,0],blueRectOff(nn,:));
+  end
 end
 Screen('DrawingFinished',winPtr);
 Screen('Flip', winPtr,[],[],[],1);
@@ -881,6 +906,12 @@ if sparam.initial_fixation_time(1)~=0
     Screen('SelectStereoDrawBuffer',winPtr,nn-1);
     Screen('DrawTexture',winPtr,background,[],CenterRect(bgRect,winRect)+yshift);
     Screen('DrawTexture',winPtr,fcross{nn},[],CenterRect(fixRect,winRect)+yshift);
+
+    % blue line for stereo sync
+    if strcmpi(dparam.ExpMode,'propixxstereo')
+      Screen('FillRect',winPtr,[0,0,255],blueRectOn(nn,:));
+      Screen('FillRect',winPtr,[0,0,0],blueRectOff(nn,:));
+    end
   end
   Screen('DrawingFinished',winPtr);
   Screen('Flip', winPtr,[],[],[],1);
@@ -930,6 +961,12 @@ for currenttrial=1:1:length(design)
           Screen('DrawTexture',winPtr,vernier,[],...
                  CenterRect(vernierRect,winRect)+[vernierOffset(trialIndex),0,vernierOffset(trialIndex),0]+yshift);
         end
+
+        % blue line for stereo sync
+        if strcmpi(dparam.ExpMode,'propixxstereo')
+          Screen('FillRect',winPtr,[0,0,255],blueRectOn(nn,:));
+          Screen('FillRect',winPtr,[0,0,0],blueRectOff(nn,:));
+        end
       end
       Screen('DrawingFinished',winPtr);
       Screen('Flip',winPtr,[],[],[],1);
@@ -948,6 +985,12 @@ for currenttrial=1:1:length(design)
       Screen('SelectStereoDrawBuffer',winPtr,nn-1);
       Screen('DrawTexture',winPtr,background,[],CenterRect(bgRect,winRect)+yshift);
       Screen('DrawTexture',winPtr,fcross{nn},[],CenterRect(fixRect,winRect)+yshift);
+
+      % blue line for stereo sync
+      if strcmpi(dparam.ExpMode,'propixxstereo')
+        Screen('FillRect',winPtr,[0,0,255],blueRectOn(nn,:));
+        Screen('FillRect',winPtr,[0,0,0],blueRectOff(nn,:));
+      end
     end
     Screen('DrawingFinished',winPtr);
     Screen('Flip',winPtr,[],[],[],1);
@@ -1052,6 +1095,12 @@ for currenttrial=1:1:length(design)
           %   Screen('DrawTexture',winPtr,vernier,[],...
           %          CenterRect(vernierRect,winRect)+[vernierOffset(trialIndex),0,vernierOffset(trialIndex),0]+yshift);
           % end
+
+          % blue line for stereo sync
+          if strcmpi(dparam.ExpMode,'propixxstereo')
+            Screen('FillRect',winPtr,[0,0,255],blueRectOn(nn,:));
+            Screen('FillRect',winPtr,[0,0,0],blueRectOff(nn,:));
+          end
         end
         Screen('DrawingFinished',winPtr);
         Screen('Flip',winPtr,[],[],[],1);
@@ -1089,6 +1138,12 @@ if sparam.initial_fixation_time(2)~=0
     Screen('SelectStereoDrawBuffer',winPtr,nn-1);
     Screen('DrawTexture',winPtr,background,[],CenterRect(bgRect,winRect)+yshift);
     Screen('DrawTexture',winPtr,fcross{nn},[],CenterRect(fixRect,winRect)+yshift);
+
+    % blue line for stereo sync
+    if strcmpi(dparam.ExpMode,'propixxstereo')
+      Screen('FillRect',winPtr,[0,0,255],blueRectOn(nn,:));
+      Screen('FillRect',winPtr,[0,0,0],blueRectOff(nn,:));
+    end
   end
   Screen('DrawingFinished',winPtr);
   Screen('Flip', winPtr,[],[],[],1);
@@ -1105,10 +1160,9 @@ end
 
 experimentDuration=GetSecs()-the_experiment_start;
 event=event.add_event('End',[]);
-disp(' ');
-fprintf('Experiment Completed: %.2f/%.2f secs\n',experimentDuration,...
+
+fprintf('\nExperiment Completed: %.2f/%.2f secs\n\n',experimentDuration,...
   sum(sparam.initial_fixation_time)+sparam.numConds*sparam.numRepeats*sparam.block_duration);
-disp(' ');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1121,7 +1175,7 @@ fprintf('saving data...');
 % save data
 savefname=fullfile(resultDir,[num2str(subjID),sprintf('_%s_run_',mfilename()),num2str(acq,'%02d'),'.mat']);
 eval(sprintf('save -append %s subjID acq sparam dparam design event gamma_table;',savefname));
-disp('done.');
+fprintf('done.\n');
 
 % calculate & display task performance
 % The codes below simply calculates the overall task accuracies, ignoring the condition differnces.
@@ -1137,7 +1191,7 @@ end
 [task.numTasks,task.numHits,task.numErrors,task.numResponses,task.RT,event]=event.calc_accuracy(correct_events);
 
 eval(sprintf('save -append %s event task;',savefname));
-disp('done.');
+fprintf('done.\n');
 
 % tell the experimenter that the measurements are completed
 try
@@ -1152,6 +1206,16 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Screen('CloseAll');
+
+% closing datapixx
+if strcmpi(dparam.exp_mode,'propixxmono') || strcmpi(dparam.exp_mode,'propixxstereo')
+  if Datapixx('IsViewpixx3D')
+    Datapixx('DisableVideoLcd3D60Hz');
+    Datapixx('RegWr');
+  end
+  Datapixx('Close');
+end
+
 ShowCursor();
 Priority(0);
 GammaResetPTB(1.0);
@@ -1169,6 +1233,19 @@ catch %#ok
   % this "catch" section executes in case of an error in the "try" section
   % above.  Importantly, it closes the onscreen window if its open.
   Screen('CloseAll');
+
+  if exist('dparam','var')
+    if isstructmember(dparam,'exp_mode')
+      if strcmpi(dparam.exp_mode,'propixxmono') || strcmpi(dparam.exp_mode,'propixxstereo')
+        if Datapixx('IsViewpixx3D')
+          Datapixx('DisableVideoLcd3D60Hz');
+          Datapixx('RegWr');
+        end
+        Datapixx('Close');
+      end
+    end
+  end
+
   ShowCursor();
   Priority(0);
   GammaResetPTB(1.0);
