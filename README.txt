@@ -2,11 +2,11 @@
 README.txt on StereofMRIsample
 
 Created    : "2017-12-29 13:08:04 ban"
-Last Update: "2017-12-29 14:58:56 ban"
+Last Update: "2021-06-13 21:52:06 ban"
 **************************************************
 
 
-A block-design fMRI experiment with wedge-shaped stimulu consisted of near/far random-dot-stereograms (RDSs).
+A block-design fMRI experiment with wedge-shaped stimuli consisted of near/far random-dot-stereograms (RDSs).
 function StereofMRIsample(subjID,acq,:displayfile,:stimulusfile,:gamma_table,:overwrite_flg)
 (: is optional)
 
