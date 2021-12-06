@@ -26,9 +26,18 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %   antialiased (Gaussian-smoothed) dots with alpha-channel (transparency) setups and by oversampling the position shift
 %   (horizontal binocular disparity). That is why the stimulus generation pipeline in this function is a bit complex.
 %
+% [how to run the script]
+% 1. On the MATLAB shell, please change the working directory to
+%    ~/StereofMRIsample/Presentation/
+% 2. Run the "run_exp" script
+%    >> run_exp('subj_name',1,1); % to present wedge-shaped depth planes.
+%    >> run_exp('subj_name',2,1); % to present random depth patches.
+%    Here, the first input variable is subject name or ID, such as 'HB' or 's01',
+%    the second variable should be 1 or 2,
+%    the third variable is run number, 1,2,3,...
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2021-06-10 01:26:18 ban"
+% Last Update: "2021-06-13 22:04:46 ban"
 %
 %
 % [input]
