@@ -2,23 +2,23 @@
 # **README on StereofMRIsample**
 
 <div>Created    : "2017-12-29 13:08:04 ban"</div>
-<div>Last Update: "2021-12-06 17:13:33 ban"
+<div>Last Update: "2021-12-07 17:18:11 ban"
 
 **********
 
-**StereofMRIsample**
+## **StereofMRIsample**
 
 
 ![StereofMRIsample](imgs/StereofMRIsample.png)  
 
-**A sample stimulus presentation package for stereo vision fMRI experiment (Block design) in our research group**  
+**Sample stimulus presentation codes for stereo vision fMRI experiment (Block design) in our research group**  
 
 - This package contains a set of sample **MATLAB and Psychtoolbox-3 (PTB3)** scripts for a block-design fMRI experiment on 3D vision.
 - It displays near/far (compared the fixational plane) wedge-shaped stimuli defined by binocular disparities.
 - The near/far wedges are rendered as the standard random-dot-stereogram (RDS) images.
 - If you set sparam.stim_mode=2 in the stimulus file, you can present random depth patches instead of the RDSs. This is prepared just for fun.
 - This script should be run with MATLAB PTB3 ver 3.0.15 or above (not tested with pervious versions of PTB3 and PTB2).
-- Please note that, in general, if we use PTB3, RDS stimuli can be easily generated with Screen('DrawDots') function. However, the dots generated with the simple PTB3 function are not antialiased, which may cause some problem due to round-offs of the fine depth structures. Therefore, in this function, I am taking a different strategy to generate RDSs by putting antialiased (Gaussian-smoothed) dots with alpha-channel (transparency) setups and by oversampling the position shift (horizontal binocular disparity). That is why the stimulus generation pipeline in this function is a bit complicated. If you don't care such the antialiased matter at all, the script can be made more concise and much simpler. Please try too.
+- Please note that, in general, if we use PTB3, RDS stimuli can be easily generated with Screen('DrawDots') function. However, the dots generated with the simple PTB3 function are not antialiased, which may cause some problem due to round-offs of the fine depth structures. Therefore, in this function, I am taking a different strategy to generate RDSs by putting antialiased (Gaussian-smoothed) dots with alpha-channel (transparency) setups and by oversampling the position shift (horizontal binocular disparity). That is why the stimulus generation pipeline in this function is a bit complicated. If you don't care such the antialiased matter at all, the script can be made more concise and much simpler. Maybe there's a better way...
 - ***Finally, this package is made publicly available in the hope of keeping our research group being transparent and open. Furthermore, the package is made open also for people who are interested in our group's research activities, who want to join our group in the near future, and who want to learn how to create stereo stimuli for vision science.*** To these ends, I have tried to make the samples as simple as possible (but also as real as possible so as to be available in the real experiments in the form of what this package is) with omitting any kinds of hacking-like codes to compensate stimulus presentation timings etc. If you need such routines, please check the other stimulus presentation codes in my [**Retinotopy**](https://github.com/hiroshiban/retinotopy) repository etc.)
 
 (Matlab is a registered trademark of [***The Mathworks Inc.*** ](https://www.mathworks.com/) )  
@@ -28,17 +28,17 @@ We are happy if this package can somehow help your research projects.
 
 **Stimulus presentation and tasks**
 
-The presentation will start by pressing the start button you defined as sparam.start_method. The wedge-shaped RDS images will be presented, following a block design (you can change the parameters by modifying values described in the displayfile and stimulusfile). By default, the sample present stimuli follow the protocol below:  
+The presentation will start by pressing the start button you defined as sparam.start_method. The wedge-shaped RDS images will be presented, following a block design (you can change the parameters by modifying values described in the displayfile and stimulusfile). By default, the sample script presents stimuli follow the protocol below:  
 &nbsp;&nbsp; ***16s fixation + {(16s stimulus presentation (+ 16s fixation) ) x N depth types x M cycles} + 16s fixation.***  
 
-During the stimulus presentation, a participant is asked to perform ***an attention-demanding vernier bar discrimination task*** (For details, please also see *Ban et al., 2012; Dovencioglu, et al., 2013; Murphy, et al., 2013; Dekker, et al., 2015.* etc.). Specifically, during the presentation, at random timings, a small vertical bar is presented briefly either on the right or left side of the fixation compared to the display center. Then, if participants find emergence of the vertical bar, they are asked to press
+During the stimulus presentation, participants are asked to perform ***an attention-demanding vernier bar discrimination task*** (For details, please also see *Ban et al., 2012; Dovencioglu, et al., 2013; Murphy, et al., 2013; Dekker, et al., 2015.* etc.). Specifically, during the presentation, at random timings, a small vertical bar is presented briefly either on the right or left side of the fixation compared to the display center. Then, if participants find emergence of the vertical bar, they are asked to press
   - key1 when the vernier line is presented on the left side of the fixation (defined in displayfile)  
   - key2 when the vernier line is presented on the right side of the fixation  
 
 For more details, please read the descriptions below.  
 Also please check the header comments in ~/StereofMRIsample/Presentation/StereofMRIsample.m.  
 
-**Acknowledgment**
+## **Acknowledgment**
 
 The StereofMRIsample package uses **Psychtoolboox** library for generating/presenting/controlling binocular disparity stimuli. We would like to express our sincere gratitude to the authors for sharing these great tools.  
 
@@ -53,7 +53,7 @@ The StereofMRIsample package uses **Psychtoolboox** library for generating/prese
             [ref] [http://psychtoolbox.org/HomePage](http://psychtoolbox.org/HomePage)
 
 
-**How to run the script**
+## **How to run the script**
 
 1. On the MATLAB shell, please change the working directory to  
    *~/StereofMRIsample/Presentation/*  
@@ -69,14 +69,14 @@ The StereofMRIsample package uses **Psychtoolboox** library for generating/prese
    the second variable should be 1 (RDS images) or 2 (rectangular depth patches), and  
    the third variable is run number, 1,2,3,...  
 
-For more details, please see the documents in *StereofMRIsample.m*  
+For more details, please see the header comments in *StereofMRIsample.m*  
 Also please see the parameter files in *~/StereofMRIsample/Presentation/subj/_DEFAULT_/*.  
 
 For checking the routines of stimulus image generations, please see  
 *~/StereofMRIsample/Generation* and *~/StereofMRIsample/Common* directories.
 
 
-**Usage**
+## **Usage**
 
 ```Matlab
 function StereofMRIsample(subjID,acq,:displayfile,:stimulusfile,:gamma_table,:overwrite_flg,:force_proceed_flag,:stim_mode)
@@ -84,14 +84,14 @@ function StereofMRIsample(subjID,acq,:displayfile,:stimulusfile,:gamma_table,:ov
 ```
 
 
-**Example**
+## **Example**
 
 ```Matlab
 >> StereofMRIsample('HB',1,'nf_display.m','nf_stimulus_exp1.m');
 ```
 
 
-**Input variables**
+## **Input variables**
 
 <pre>
 sujID         : ID of a subject, a string, e.g. 'HB' or 's01'
@@ -137,23 +137,21 @@ displayfile & stimulusfile should be located at
 </pre>
 
 
-**Output variable and result file** 
+## **Output variable and result file** 
 
 <pre>
-no output variable. the results (stimulus presentation timings, participant responses) are saved as
+no output variable. the results (stimulus presentation timings, participant responses) are saved at
+~/StereofMRIsample/Presentation/subjects/(subjID)/ as
 1. an event log and behavior task result file
-   stored ./subjects/(subjID)/results/(today)
-   as ./subjects/(subjID)/results/(today)/(subjID)_(file_name_of_this_function)_run_(run_num).mat
+   /results/(today(yymmdd))(subjID)_(file_name_of_this_function)_run_(run_num).mat
 2. a stimulus presentation log file
-   stored ./subjects/(subjID)/results/(today)
-   as ./subjects/(subjID)/results/(today)/(subjID)_(file_name_of_this_function)_run_(run_num).log
+   /results/(today(yymmdd))(subjID)_(file_name_of_this_function)_run_(run_num).log
 3. a design file
-   stored ./subjects/(subjID)/design/(today)
-   as ./subjects/(subjID)/design/(today)/(subjID)_design_run_(run_num).txt
+   /design/(today)/(subjID)_design_run_(run_num).txt
 </pre>
 
 
-**Details of displayfile**
+## **Details of displayfile**
 
 An example of "displayfile":  
 
@@ -164,7 +162,7 @@ An example of "displayfile":
 % the stimulus presentations.
 %
 % Created    : "2015-08-24 10:27:05 ban"
-% Last Update: "2021-12-06 17:13:33 ban"
+% Last Update: "2021-12-07 17:18:11 ban"
 % ************************************************************
 
 % dparam: display parameters
@@ -206,7 +204,7 @@ dparam.skip_sync_test=0;
 ````
 
 
-**Details of stimulusfile**
+## **Details of stimulusfile**
 
 An example of "stimulusfile":  
 
