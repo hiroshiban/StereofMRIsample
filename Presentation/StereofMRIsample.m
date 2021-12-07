@@ -37,17 +37,18 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %    the third variable is run number, 1,2,3,...
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2021-06-13 22:04:46 ban"
+% Last Update: "2021-12-08 04:29:17 ban"
 %
 %
 % [input]
 % sujID         : ID of a subject, a string, e.g. 'HB' or 's01'
 %                 you have to create a directory ./subjects/(subj) and locate displayfile and stimulusfile there.
-%                 !!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!!!!
-%                 !!! if 'debug' (case insensitive) is included             !!!
-%                 !!! in subjID string, this program runs as DEBUG mode;    !!!
-%                 !!! stimulus images are saved as *.png format at ./images !!!
-%                 !!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!!!!
+%                 !!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!
+%                 !!! if 'debug' (case insensitive) is included          !!!
+%                 !!! in subjID string, this program runs as DEBUG mode; !!!
+%                 !!! stimulus images are saved as *.png format at       !!!
+%                 !!! ~/StereofMRIsample/Presentation/images             !!!
+%                 !!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!
 % acq           : acquisition number (design file number),
 %                 a integer, such as 1, 2, 3, ...
 % displayfile   : (optional) a display parameter file (*.m). e.g. 'nf_display_fmri.m'

@@ -1,8 +1,7 @@
-
 # **README on StereofMRIsample**
 
 <div>Created    : "2017-12-29 13:08:04 ban"</div>
-<div>Last Update: "2021-12-07 17:18:11 ban"
+<div>Last Update: "2021-12-08 05:23:48 ban"
 
 **********
 
@@ -19,7 +18,7 @@
 - If you set sparam.stim_mode=2 in the stimulus file, you can present random depth patches instead of the RDSs. This is prepared just for fun.
 - This script should be run with MATLAB PTB3 ver 3.0.15 or above (not tested with pervious versions of PTB3 and PTB2).
 - Please note that, in general, if we use PTB3, RDS stimuli can be easily generated with Screen('DrawDots') function. However, the dots generated with the simple PTB3 function are not antialiased, which may cause some problem due to round-offs of the fine depth structures. Therefore, in this function, I am taking a different strategy to generate RDSs by putting antialiased (Gaussian-smoothed) dots with alpha-channel (transparency) setups and by oversampling the position shift (horizontal binocular disparity). That is why the stimulus generation pipeline in this function is a bit complicated. If you don't care such the antialiased matter at all, the script can be made more concise and much simpler. Maybe there's a better way...
-- ***Finally, this package is made publicly available in the hope of keeping our research group being transparent and open. Furthermore, the package is made open also for people who are interested in our group's research activities, who want to join our group in the near future, and who want to learn how to create stereo stimuli for vision science.*** To these ends, I have tried to make the samples as simple as possible (but also as real as possible so as to be available in the real experiments in the form of what this package is) with omitting any kinds of hacking-like codes to compensate stimulus presentation timings etc. If you need such routines, please check the other stimulus presentation codes in my [**Retinotopy**](https://github.com/hiroshiban/retinotopy) repository etc.)
+- ***Finally, this package is made publicly available in the hope of keeping our research group being transparent and open. Furthermore, the package is made open also for people who want to know our group's research activities, who want to join our group in the near future, and who want to learn how to create stereo stimuli for vision science. If you are interested in our research projects, please feel free to contact us.*** Anyway, to these ends, I have tried to make the samples as simple as possible (but also as real as possible so as to be available in the real experiments in the form of what this package is) with omitting any kinds of hacking-like codes to compensate stimulus presentation timings etc. If you need such routines, please check the other stimulus presentation codes in my [**Retinotopy**](https://github.com/hiroshiban/retinotopy) repository etc.).
 
 (Matlab is a registered trademark of [***The Mathworks Inc.*** ](https://www.mathworks.com/) )  
 
@@ -40,7 +39,7 @@ Also please check the header comments in ~/StereofMRIsample/Presentation/Stereof
 
 ## **Acknowledgment**
 
-The StereofMRIsample package uses **Psychtoolboox** library for generating/presenting/controlling binocular disparity stimuli. We would like to express our sincere gratitude to the authors for sharing these great tools.  
+The StereofMRIsample package uses **Psychtoolboox** library for generating/presenting/controlling binocular disparity stimuli. We would like to express our sincere gratitude to the authors for sharing the great toolbox.  
 
 **Psychtoolbox** : The individual Psychtoolbox core developers,  
             (c) 1996-2011, David Brainard  
@@ -97,11 +96,12 @@ function StereofMRIsample(subjID,acq,:displayfile,:stimulusfile,:gamma_table,:ov
 sujID         : ID of a subject, a string, e.g. 'HB' or 's01'
                 you have to create a directory ./subjects/(subj) and
                 locate displayfile and stimulusfile there.
-                !!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!!!!
-                !!! if 'debug' (case insensitive) is included             !!!
-                !!! in subjID string, this program runs as DEBUG mode;    !!!
-                !!! stimulus images are saved as *.png format at ./images !!!
-                !!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!!!!
+                !!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!
+                !!! if 'debug' (case insensitive) is included          !!!
+                !!! in subjID string, this program runs as DEBUG mode; !!!
+                !!! stimulus images are saved as *.png format at       !!!
+                !!! ~/StereofMRIsample/Presentation/images             !!!
+                !!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!
 acq           : acquisition number (design file number),
                 a integer, such as 1, 2, 3, ...
 displayfile   : (optional) a display parameter file (*.m). e.g. 'nf_display_fmri.m'
@@ -121,8 +121,8 @@ overwrite_flg : (optional) whether overwriting pre-existing result file. if 1, t
                 file with the same acquisition number will be overwritten by the previous one.
                 if 0, the existing file will be backed-up by adding a prefix '_old' at the tail
                 of the file. 0 by default.
-force_proceed_flag : (optional) whether proceeding stimulus presentatin without waiting for
-                the experimenter response (e.g. presesing the ENTER key) or a trigger.
+force_proceed_flag : (optional) whether proceeding stimulus presentation without waiting for
+                the experimenter response (e.g. pressing the ENTER key) or a trigger.
                 if 1, the stimulus presentation will be automatically carried on.
 stim_mode     : (optional) stimulus mode. 1 or 2. this script presents wedge-shaped near/far depth
                 stimuli when stim_mode=1, while it presents multiple random-depth patches when
@@ -162,7 +162,7 @@ An example of "displayfile":
 % the stimulus presentations.
 %
 % Created    : "2015-08-24 10:27:05 ban"
-% Last Update: "2021-12-07 17:18:11 ban"
+% Last Update: "2021-12-07 18:26:19 ban"
 % ************************************************************
 
 % dparam: display parameters
