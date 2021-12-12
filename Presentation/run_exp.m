@@ -18,10 +18,10 @@ function OK=run_exp(subj,exp_num,run_ids)
 %           without any error [true/false]
 %
 % Created    : "2017-12-29 13:07:06 ban"
-% Last Update: "2019-03-01 15:15:30 ban"
+% Last Update: "2021-12-09 10:40:13 ban"
 
 %% input variable check
-if nargin<3, help(mfilenae()); return; end
+if nargin<3, help(mfilename()); return; end
 
 if isempty(intersect(exp_num,[1,2]))
   warning('MATLAB:exp_num_error','exp_num should be 1 or 2. please chech the input variable.');
