@@ -2,7 +2,7 @@
 
 <div align="right">
 Created    : "2017-12-29 13:08:04 ban"<br>
-Last Update: "2021-12-13 07:29:31 ban"
+Last Update: "2021-12-14 02:12:15 ban"
 </div>
 
 <br>
@@ -21,7 +21,7 @@ Last Update: "2021-12-13 07:29:31 ban"
 ## **StereofMRIsample**
 
 
-![StereofMRIsample](imgs/StereofMRIsample.png)  
+![StereofMRIsample](doc/images/StereofMRIsample.png)  
 
 **Sample stimulus presentation codes for stereo vision fMRI experiment (Block design) in our research group**  
 
