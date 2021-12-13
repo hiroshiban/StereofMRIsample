@@ -37,7 +37,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %    the third variable is run number, 1,2,3,...
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2021-12-08 04:29:17 ban"
+% Last Update: "2021-12-14 01:13:09 ban"
 %
 %
 % [input]
@@ -664,10 +664,11 @@ if strfind(upper(subjID),'DEBUG')
                      imresize(imgL{tt}{ii,jj},size(imgL{tt}{ii,jj}).*[1,1/sparam.oversampling_ratio])]);
         else
           img=CreateDepthPatchField(sparam.fieldSize,[10,10],sparam.ipd,sparam.vdist,sparam.pix_per_cm,...
-                                    sparam.disparity(design(1)),[-3,3],1,sparam.oversampling_ratio,1,sparam.bgcolor);
-          img=uint8([imresize(img{2}{tt}{ii,jj},size(img{2}{tt}{ii,jj}).*[1,1/sparam.oversampling_ratio]),...
-                     sparam.colors(3)*ones(size(img{1}{tt}{ii,jj},1),50),...
-                     imresize(img{1}{tt}{ii,jj},size(img{1}{tt}{ii,jj}).*[1,1/sparam.oversampling_ratio])]);
+                                    sparam.disparity(design(1)),[-12,12],1,sparam.oversampling_ratio,1,sparam.bgcolor);
+          sz=size(img{1});
+          img=uint8([imresize(img{2},sz(1:2).*[1,1/sparam.oversampling_ratio]),...
+                     repmat(sparam.colors(3),[size(img{1},1),50,3]),...
+                     imresize(img{1},sz(1:2).*[1,1/sparam.oversampling_ratio])]);
         end
         imshow(img); axis equal; axis off;
         fname=sprintf('wedge_depth_stimulus_jitter_%.2f_disparity_%.2f_trial_%03d.png',sparam.jitters(tt),sparam.disparity(ii),jj);

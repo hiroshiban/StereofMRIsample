@@ -18,7 +18,7 @@ function OK=run_exp(subj,exp_num,run_ids)
 %           without any error [true/false]
 %
 % Created    : "2017-12-29 13:07:06 ban"
-% Last Update: "2021-12-09 10:40:13 ban"
+% Last Update: "2021-12-14 00:48:13 ban"
 
 %% input variable check
 if nargin<3, help(mfilename()); return; end
@@ -76,7 +76,7 @@ load(fullfile('..','gamma_table','ASUS_ROG_Swift_PG278Q','181003','cbs','gammata
 
 %% run the stimulus presentation code
 for ii=run_ids
-  command_str=sprintf('StereofMRIsample(''%s'',%d,''sample_displayfile'',''sample_stimulusfile'',gammatable,1,%d);',subj,ii,exp_num);
+  command_str=sprintf('StereofMRIsample(''%s'',%d,''sample_displayfile'',''sample_stimulusfile'',gammatable,1,1,%d);',subj,ii,exp_num);
   eval(command_str);
 end
 OK=true;
