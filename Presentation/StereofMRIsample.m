@@ -37,7 +37,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 %    the third variable is run number, 1,2,3,...
 %
 % Created    : "2017-12-29 14:33:31 ban"
-% Last Update: "2021-12-14 01:13:09 ban"
+% Last Update: "2024-10-31 14:05:26 ban"
 %
 %
 % [input]
@@ -103,7 +103,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 % % the stimulus presentations.
 % %
 % % Created    : "2017-12-28 10:27:05 ban"
-% % Last Update: "2021-06-10 01:26:18 ban"
+% % Last Update: "2024-10-31 14:05:26 ban"
 % % ************************************************************
 %
 % % dparam: display parameters
@@ -151,7 +151,7 @@ function StereofMRIsample(subjID,acq,displayfile,stimulusfile,gamma_table,overwr
 % % the stimulus presentations.
 % %
 % % Created    : "2017-12-28 10:27:05 ban"
-% % Last Update: "2021-06-10 01:26:18 ban"
+% % Last Update: "2024-10-31 14:05:26 ban"
 % % ************************************************************
 %
 % % sparam: stimulus generation parameters
@@ -876,7 +876,7 @@ for nn=1:1:nScr
   end
 end
 Screen('DrawingFinished',winPtr);
-Screen('Flip', winPtr,[],[],[],1);
+Screen('Flip',winPtr);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -925,7 +925,7 @@ if sparam.initial_fixation_time(1)~=0
     end
   end
   Screen('DrawingFinished',winPtr);
-  Screen('Flip', winPtr,[],[],[],1);
+  Screen('Flip',winPtr);
 
   % wait for the initial fixation
   targetTime=targetTime+sparam.initial_fixation_time(1);
@@ -980,7 +980,7 @@ for currenttrial=1:1:length(design)
         end
       end
       Screen('DrawingFinished',winPtr);
-      Screen('Flip',winPtr,[],[],[],1);
+      Screen('Flip',winPtr);
 
       % wait for stim_on_duration
       % here the /2 is required since each presentation period is devided into 2.
@@ -1004,7 +1004,7 @@ for currenttrial=1:1:length(design)
       end
     end
     Screen('DrawingFinished',winPtr);
-    Screen('Flip',winPtr,[],[],[],1);
+    Screen('Flip',winPtr);
 
     % preparing the next stimuli
 
@@ -1114,7 +1114,7 @@ for currenttrial=1:1:length(design)
           end
         end
         Screen('DrawingFinished',winPtr);
-        Screen('Flip',winPtr,[],[],[],1);
+        Screen('Flip',winPtr);
 
         % wait for stim_on_duration
         % here the /2 is required since each presentation period is devided into 2.
@@ -1157,7 +1157,7 @@ if sparam.initial_fixation_time(2)~=0
     end
   end
   Screen('DrawingFinished',winPtr);
-  Screen('Flip', winPtr,[],[],[],1);
+  Screen('Flip',winPtr);
 
   % wait for the initial fixation
   targetTime=targetTime+sparam.initial_fixation_time(2);

@@ -20,7 +20,7 @@ function DisplayMessage(message,bgcolor,screens,drawing_font,drawing_size)
 % no output variable
 %
 % Created: Feb 04 2010 Hiroshi Ban
-% Last Update: "2013-11-22 22:51:58 ban (ban.hiroshi@gmail.com)"
+% Last Update: "2024-10-31 14:05:37 ban"
 
 % input variable check
 if nargin < 3, help DisplayMessage; end
@@ -40,20 +40,20 @@ for ii=1:1:length(screens)
   % fill the background
   greyScreen{ii}=Screen('MakeTexture',screens{ii},grey_texture);
   Screen('DrawTexture',screens{ii},greyScreen{ii});
-  
+
   % set drawing options
   eval(sprintf('Screen(screens{ii},''TextFont'',''%s'');',drawing_font));
   eval(sprintf('Screen(screens{ii},''TextSize'',%d);',drawing_size));
   if sum(bgcolor)==0
     eval(sprintf('Screen(screens{ii},''TextColor'',%d);',255));
   end
-    
+
   % draw formatterd text on the center of the screen
   DrawFormattedText(screens{ii},message,'center','center');
 end
 
 % display
 Screen('DrawingFinished',screens{1},2);
-Screen('Flip',screens{1},[],[],[],1);
+Screen('Flip',screens{1});
 
 return
